@@ -1,10 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`RUNNING ON PORT: ${process.env.PORT ?? 3001}`);
+  const PORT = process.env.PORT ?? 3001
+
+  const config =  new DocumentBuilder()
+    .setTitle('Campus Elect Backend')
+    .setDescription('API documentation for the Campus Elect application')
+    .setVersion('1.0')
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, documentFactory);
+
+  await app.listen(PORT);
+
+  console.log(`RUNNING http://localhost${PORT}`);
 }
 
 void bootstrap();
